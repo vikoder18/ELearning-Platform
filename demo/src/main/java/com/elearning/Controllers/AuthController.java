@@ -32,16 +32,16 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestParam String email) {
-        ApiResponse<String> response = authService.forgotPassword(email);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        return ResponseEntity.ok(authService.forgotPassword(email));
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<String>> changePassword(
-            @RequestParam Long userId,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword) {
+            @RequestBody Long userId,
+            @RequestBody String oldPassword,
+            @RequestBody String newPassword) {
         ApiResponse<String> response = authService.changePassword(userId, oldPassword, newPassword);
         return ResponseEntity.ok(response);
     }
