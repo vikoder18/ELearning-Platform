@@ -41,10 +41,10 @@ public class AuthController {
 
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<String>> changePassword(@RequestBody Map<String, String> body) {
-        Long userId = Long.parseLong(body.get("userId"));
+        String username = body.get("username");
         String newPassword = body.get("newPassword");
         String oldPassword = body.get("oldPassword");
-        ApiResponse<String> response = authService.changePassword(userId, oldPassword , newPassword);
+        ApiResponse<String> response = authService.changePassword(username, oldPassword , newPassword);
         return ResponseEntity.ok(response);
     }
 

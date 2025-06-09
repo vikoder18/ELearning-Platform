@@ -93,9 +93,10 @@ public class AuthService {
         }
     }
 
-    public ApiResponse<String> changePassword(Long userId, String oldPassword, String newPassword) {
+    public ApiResponse<String> changePassword(String username, String oldPassword, String newPassword) {
         try {
-            Optional<User> userOpt = userRepository.findById(userId);
+            Optional<User> userOpt = userRepository.findByUsername("username");
+
             if (userOpt.isEmpty()) {
                 return ApiResponse.error("User not found", null);
             }
