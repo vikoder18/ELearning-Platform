@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-@Transactional
+
 public class AuthService {
 
     @Autowired
@@ -46,7 +46,7 @@ public class AuthService {
             return ApiResponse.error("Login failed: " + e.getMessage(), null);
         }
     }
-
+    @Transactional
     public ApiResponse<String> signup(SignupRequestDTO signupRequest) {
         try {
             // Check if username already exists
