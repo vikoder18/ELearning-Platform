@@ -75,18 +75,21 @@ public class AuthService {
         }
     }
 
-    public ApiResponse<String> forgotPassword(String email) {
+    public ApiResponse<String> forgotPassword(String email, String newPassword) {
         try {
             Optional<User> userOpt = userRepository.findByEmail(email);
             if (userOpt.isEmpty()) {
                 return ApiResponse.error("Email not found", null);
             }
 
-            // In production, implement email sending logic here
-            return ApiResponse.success("Password reset instructions sent to your email");
+            User user = userOpt.get();
+            user.setPassword(newPassword); // In production, hash it
+            userRepository.save(user);
+
+            return ApiResponse.success("Password updated successfully");
 
         } catch (Exception e) {
-            return ApiResponse.error("Failed to process password reset: " + e.getMessage(), null);
+            return ApiResponse.error("Failed to reset password: " + e.getMessage(), null);
         }
     }
 

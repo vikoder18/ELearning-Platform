@@ -34,15 +34,17 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
-        return ResponseEntity.ok(authService.forgotPassword(email));
+        String newPassword = body.get("newPassword");
+        return ResponseEntity.ok(authService.forgotPassword(email, newPassword));
     }
+
 
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<String>> changePassword(@RequestBody Map<String, String> body) {
         Long userId = Long.parseLong(body.get("userId"));
-        String oldPassword = body.get("oldPassword");
         String newPassword = body.get("newPassword");
-        ApiResponse<String> response = authService.changePassword(userId, oldPassword, newPassword);
+        String oldPassword = body.get("oldPassword");
+        ApiResponse<String> response = authService.changePassword(userId, oldPassword , newPassword);
         return ResponseEntity.ok(response);
     }
 
