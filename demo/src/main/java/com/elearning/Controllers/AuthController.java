@@ -38,13 +38,14 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<ApiResponse<String>> changePassword(
-            @RequestBody Long userId,
-            @RequestBody String oldPassword,
-            @RequestBody String newPassword) {
+    public ResponseEntity<ApiResponse<String>> changePassword(@RequestBody Map<String, String> body) {
+        Long userId = Long.parseLong(body.get("userId"));
+        String oldPassword = body.get("oldPassword");
+        String newPassword = body.get("newPassword");
         ApiResponse<String> response = authService.changePassword(userId, oldPassword, newPassword);
         return ResponseEntity.ok(response);
     }
+
 }
 
 
