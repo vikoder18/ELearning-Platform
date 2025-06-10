@@ -12,5 +12,6 @@ public interface ChapterReadLogRepository extends JpaRepository<ChapterReadLog, 
     Optional<ChapterReadLog> findByUserIdAndChapterId(Long userId, Long chapterId);
     List<ChapterReadLog> findByUserIdAndIsCompleted(Long userId, Boolean isCompleted);
     List<ChapterReadLog> findByUserId(Long userId);
+    long countByUserIdAndIsCompleted(Long userId, boolean isCompleted);
     boolean existsByUserIdAndChapterIdAndIsCompleted(Long userId, Long chapterId, Boolean isCompleted);
 }

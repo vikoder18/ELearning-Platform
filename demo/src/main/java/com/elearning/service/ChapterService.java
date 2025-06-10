@@ -56,6 +56,16 @@ public class ChapterService {
         }
     }
 
+    private boolean hasReadAllChapters(Long userId) {
+        long totalChapters = chapterRepository.count();
+        if (totalChapters == 0) return false; // Edge case: no chapters exist
+
+        long readChapters = chapterReadLogRepository.countByUserIdAndIsCompleted(userId, true);
+        return readChapters >= totalChapters;
+    }
+
+
+
     public ApiResponse<List<String>> getAllContentUrls() {
         try {
             List<Chapter> chapters = chapterRepository.findAll();
