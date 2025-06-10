@@ -75,11 +75,11 @@ public class AuthService {
         }
     }
 
-    public ApiResponse<String> forgotPassword(String email, String newPassword) {
+    public ApiResponse<String> forgotPassword(String username, String newPassword) {
         try {
-            Optional<User> userOpt = userRepository.findByEmail(email);
+            Optional<User> userOpt = userRepository.findByUsername(username);
             if (userOpt.isEmpty()) {
-                return ApiResponse.error("Email not found", null);
+                return ApiResponse.error("Username not found", null);
             }
 
             User user = userOpt.get();
