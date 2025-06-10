@@ -1,12 +1,12 @@
 package com.elearning.entity;
-
-import jakarta.persistence.*;
 import lombok.Data;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 @Data
 @Entity
-@Table(name = "el_chapter_read_logs")
+@Table(name = "chapter_read_log")
 public class ChapterReadLog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,25 +17,51 @@ public class ChapterReadLog {
     @Column(name = "chapter_id", nullable = false)
     private Long chapterId;
 
-    @Column(name = "read_date")
-    private LocalDateTime readDate;
-
-    @Column(name = "is_completed")
+    @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted = false;
 
-    @PrePersist
-    protected void onCreate() {
-        readDate = LocalDateTime.now();
-    }
+    @Column(name = "visited_at")
+    private LocalDateTime visitedAt;
 
-    // Constructors
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Default constructor
     public ChapterReadLog() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
+    // Constructor with parameters
     public ChapterReadLog(Long userId, Long chapterId, Boolean isCompleted) {
         this.userId = userId;
         this.chapterId = chapterId;
         this.isCompleted = isCompleted;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (isCompleted) {
+            this.visitedAt = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "ChapterReadLog{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", chapterId=" + chapterId +
+                ", isCompleted=" + isCompleted +
+                ", visitedAt=" + visitedAt +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }
-
