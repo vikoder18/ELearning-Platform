@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -54,6 +55,21 @@ public class ChapterService {
             return ApiResponse.error("Failed to retrieve chapters: " + e.getMessage(), null);
         }
     }
+
+    public ApiResponse<List<String>> getAllContentUrls() {
+        try {
+            List<Chapter> chapters = chapterRepository.findAll();
+            List<String> contentUrls = chapters.stream()
+                    .map(Chapter::getContentUrl)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            return ApiResponse.success("Fetched all content URLs", contentUrls);
+        } catch (Exception e) {
+            return ApiResponse.error("Failed to fetch content URLs: " + e.getMessage(), null);
+        }
+    }
+
 
     public ApiResponse<ChapterResponseDTO> createChapter(ChapterResponseDTO dto) {
         // Map DTO to Entity

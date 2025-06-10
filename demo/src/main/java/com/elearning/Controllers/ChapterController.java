@@ -23,6 +23,12 @@ public class ChapterController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/content-urls")
+    public ResponseEntity<ApiResponse<List<String>>> getAllContentUrls() {
+        ApiResponse<List<String>> response = chapterService.getAllContentUrls();
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ChapterResponseDTO>>> getAllChapters(@RequestParam Long userId) {
