@@ -29,8 +29,7 @@ public class ChapterController {
         return ResponseEntity.ok(response);
     }
 
-
-    @GetMapping
+    @GetMapping("/chapter-user")
     public ResponseEntity<ApiResponse<List<ChapterResponseDTO>>> getAllChapters(@RequestParam Long userId) {
         ApiResponse<List<ChapterResponseDTO>> response = chapterService.getAllChapters(userId);
         return ResponseEntity.ok(response);
