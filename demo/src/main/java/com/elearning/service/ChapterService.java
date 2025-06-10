@@ -55,6 +55,33 @@ public class ChapterService {
         }
     }
 
+    public ApiResponse<ChapterResponseDTO> createChapter(ChapterResponseDTO dto) {
+        // Map DTO to Entity
+        Chapter chapter = new Chapter();
+        chapter.setTitle(dto.getTitle());
+        chapter.setDescription(dto.getDescription());
+        chapter.setContentType(Chapter.ContentType.valueOf(dto.getContentType().toUpperCase()));
+        chapter.setContentUrl(dto.getContentUrl());
+
+        // Save to DB
+        Chapter savedChapter = chapterRepository.save(chapter);
+
+        // Map back to DTO
+        ChapterResponseDTO responseDTO = new ChapterResponseDTO(
+                savedChapter.getId(),
+                savedChapter.getTitle(),
+                savedChapter.getDescription(),
+                savedChapter.getContentType().name(),
+                savedChapter.getContentUrl(),
+                savedChapter.isRead(),
+                savedChapter.isCanStartTest()
+        );
+
+        return ApiResponse.success("Chapter created successfully", responseDTO);
+    }
+
+
+
     public ApiResponse<ChapterResponseDTO> getChapterById(Long chapterId, Long userId) {
         try {
             Optional<Chapter> chapterOpt = chapterRepository.findById(chapterId);

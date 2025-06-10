@@ -15,7 +15,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/chapters/**").permitAll()
+                        .anyRequest().permitAll()//authenticated()
                 )
                 .csrf(csrf -> csrf.disable())  // ✅ Compliant with Spring Security 6.1+
                 .httpBasic(httpBasic -> {}); // or .formLogin() if preferred

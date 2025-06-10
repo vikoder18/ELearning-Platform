@@ -17,6 +17,13 @@ public class ChapterController {
     @Autowired
     private ChapterService chapterService;
 
+    @PostMapping("/create-chapter")
+    public ResponseEntity<ApiResponse<ChapterResponseDTO>> createChapter(@RequestBody ChapterResponseDTO chapterResponse) {
+        ApiResponse<ChapterResponseDTO> response = chapterService.createChapter(chapterResponse);
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping
     public ResponseEntity<ApiResponse<List<ChapterResponseDTO>>> getAllChapters(@RequestParam Long userId) {
         ApiResponse<List<ChapterResponseDTO>> response = chapterService.getAllChapters(userId);

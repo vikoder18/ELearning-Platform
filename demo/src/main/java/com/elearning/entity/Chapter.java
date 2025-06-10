@@ -30,6 +30,13 @@ public class Chapter {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_read")
+    private boolean read;
+
+    @Column(name = "can_start_test")
+    private boolean canStartTest;
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
