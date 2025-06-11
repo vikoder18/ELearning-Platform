@@ -4,6 +4,7 @@ import com.elearning.DTO.*;
 import com.elearning.entity.*;
 import com.elearning.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,7 @@ public class TestService {
     private ChapterRepository chapterRepository;
 
     @Transactional
-    public ApiResponse<Map<String, Object>> startTest(Long userId, Long chapterId) {
+    public ApiResponse<Map<String, Object>> startTest(@Nullable Long chapterId, Long userId) {
 
         int totalQuestions = 10;
 
@@ -72,7 +73,10 @@ public class TestService {
         //Step 5: Create TestSession and save
         TestSession session = new TestSession();
         session.setUserId(userId);
-        session.setChapterId(chapterId); // Optional
+        if (chapterId != null) {
+            session.setChapterId(chapterId);
+        }
+        //session.setChapterId(chapterId); // Optional
         session.setStartedAt(LocalDateTime.now());
         //session.setQuestions(finalQuestionSet); // Save question list if supported
         testSessionRepository.save(session);
