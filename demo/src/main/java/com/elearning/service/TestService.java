@@ -76,6 +76,7 @@ public class TestService {
         if (chapterId != null) {
             session.setChapterId(chapterId);
         }
+        session.setTotalQuestions(finalQuestionSet.size());
         //session.setChapterId(chapterId); // Optional
         session.setStartedAt(LocalDateTime.now());
         //session.setQuestions(finalQuestionSet); // Save question list if supported
@@ -106,7 +107,7 @@ public class TestService {
                 return ApiResponse.error("Unauthorized access to test session", null);
             }
 
-            List<TestResultResponseDTO.QuestionResultDTO> questionResults = new ArrayList<>();
+            List<QuestionResultDTO> questionResults = new ArrayList<>();
             int correctAnswers = 0;
 
             // Process each answer
@@ -140,8 +141,8 @@ public class TestService {
                     }
 
                     // Add to question results
-                    TestResultResponseDTO.QuestionResultDTO questionResult =
-                            new TestResultResponseDTO.QuestionResultDTO(
+                    QuestionResultDTO questionResult =
+                            new QuestionResultDTO(
                                     question.getId(),
                                     question.getQuestionText(),
                                     answer.getSelectedAnswer(),
@@ -174,8 +175,8 @@ public class TestService {
             response.setTestSessionId(session.getId());
             response.setChapterId(session.getChapterId());
 
-            Optional<Chapter> chapterOpt = chapterRepository.findById(session.getChapterId());
-            response.setChapterTitle(chapterOpt.map(Chapter::getTitle).orElse("Chapter " + session.getChapterId()));
+           // Optional<Chapter> chapterOpt = chapterRepository.findById(session.getChapterId());
+           // response.setChapterTitle(chapterOpt.map(Chapter::getTitle).orElse("Chapter " + session.getChapterId()));
 
             response.setTotalQuestions(session.getTotalQuestions());
             response.setCorrectAnswers(correctAnswers);
@@ -189,71 +190,72 @@ public class TestService {
         } catch (Exception e) {
             return ApiResponse.error("Failed to submit test: " + e.getMessage(), null);
         }
+
     }
-
+    @Transactional(readOnly = true)
     public ApiResponse<TestResultResponseDTO> getTestResult(String testSessionId, Long userId) {
-        try {
-            Optional<TestSession> sessionOpt = testSessionRepository.findById(testSessionId);
-            if (sessionOpt.isEmpty()) {
-                return ApiResponse.error("Test session not found", null);
-            }
-
-            TestSession session = sessionOpt.get();
-
-            // Verify user owns this session
-            if (!session.getUserId().equals(userId)) {
-                return ApiResponse.error("Unauthorized access to test results", null);
-            }
-
-            // Get test results
-            List<TestResult> results = testResultRepository.findByTestSessionId(testSessionId);
-
-            List<TestResultResponseDTO.QuestionResultDTO> questionResults = new ArrayList<>();
-
-            for (TestResult result : results) {
-                Optional<Question> questionOpt = questionRepository.findById(result.getQuestionId());
-                if (questionOpt.isPresent()) {
-                    Question question = questionOpt.get();
-
-                    String chapterReference = null;
-                    if (!result.getIsCorrect()) {
-                        Optional<Chapter> chapterOpt = chapterRepository.findById(question.getChapterId());
-                        chapterReference = chapterOpt.map(Chapter::getTitle).orElse("Chapter " + question.getChapterId());
-                    }
-
-                    TestResultResponseDTO.QuestionResultDTO questionResult =
-                            new TestResultResponseDTO.QuestionResultDTO(
-                                    question.getId(),
-                                    question.getQuestionText(),
-                                    result.getSelectedAnswer(),
-                                    question.getCorrectAnswer(),
-                                    result.getIsCorrect(),
-                                    chapterReference
-                            );
-                    questionResults.add(questionResult);
+            try {
+                Optional<TestSession> sessionOpt = testSessionRepository.findById(testSessionId);
+                if (sessionOpt.isEmpty()) {
+                    return ApiResponse.error("Test session not found", null);
                 }
+
+                TestSession session = sessionOpt.get();
+
+                // Verify user owns this session
+                if (!session.getUserId().equals(userId)) {
+                    return ApiResponse.error("Unauthorized access to test results", null);
+                }
+
+                // Get test results
+                List<TestResult> results = testResultRepository.findByTestSessionId(testSessionId);
+
+                List<QuestionResultDTO> questionResults = new ArrayList<>();
+
+                for (TestResult result : results) {
+                    Optional<Question> questionOpt = questionRepository.findById(result.getQuestionId());
+                    if (questionOpt.isPresent()) {
+                        Question question = questionOpt.get();
+
+                        String chapterReference = null;
+                        if (!result.getIsCorrect()) {
+                            Optional<Chapter> chapterOpt = chapterRepository.findById(question.getChapterId());
+                            chapterReference = chapterOpt.map(Chapter::getTitle).orElse("Chapter " + question.getChapterId());
+                        }
+
+                        QuestionResultDTO questionResult =
+                                new QuestionResultDTO(
+                                        question.getId(),
+                                        question.getQuestionText(),
+                                        result.getSelectedAnswer(),
+                                        question.getCorrectAnswer(),
+                                        result.getIsCorrect(),
+                                        chapterReference
+                                );
+                        questionResults.add(questionResult);
+                    }
+                }
+
+                // Create response
+                TestResultResponseDTO response = new TestResultResponseDTO();
+                response.setTestSessionId(session.getId());
+                response.setChapterId(session.getChapterId());
+
+                Optional<Chapter> chapterOpt = chapterRepository.findById(session.getChapterId());
+                response.setChapterTitle(chapterOpt.map(Chapter::getTitle).orElse("Chapter " + session.getChapterId()));
+
+                response.setTotalQuestions(session.getTotalQuestions());
+                response.setCorrectAnswers(session.getCorrectAnswers());
+                response.setScorePercentage(session.getScorePercentage().doubleValue());
+                response.setPassed(session.getPassed());
+                response.setCertificateGenerated(session.getCertificateGenerated());
+                response.setQuestionResults(questionResults);
+
+                return ApiResponse.success("Test results retrieved successfully", response);
+            }catch(Exception e){
+                e.printStackTrace(); // or use a logger
+                throw e;
             }
-
-            // Create response
-            TestResultResponseDTO response = new TestResultResponseDTO();
-            response.setTestSessionId(session.getId());
-            response.setChapterId(session.getChapterId());
-
-            Optional<Chapter> chapterOpt = chapterRepository.findById(session.getChapterId());
-            response.setChapterTitle(chapterOpt.map(Chapter::getTitle).orElse("Chapter " + session.getChapterId()));
-
-            response.setTotalQuestions(session.getTotalQuestions());
-            response.setCorrectAnswers(session.getCorrectAnswers());
-            response.setScorePercentage(session.getScorePercentage().doubleValue());
-            response.setPassed(session.getPassed());
-            response.setCertificateGenerated(session.getCertificateGenerated());
-            response.setQuestionResults(questionResults);
-
-            return ApiResponse.success("Test results retrieved successfully", response);
-
-        } catch (Exception e) {
-            return ApiResponse.error("Failed to retrieve test results: " + e.getMessage(), null);
-        }
     }
 
     public ApiResponse<List<TestSession>> getUserTestHistory(Long userId) {
