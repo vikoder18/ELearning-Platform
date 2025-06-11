@@ -40,7 +40,6 @@ public class Question {
         createdAt = LocalDateTime.now();
     }
 
-    // Constructors
     public Question() {
     }
 

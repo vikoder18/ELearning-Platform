@@ -31,51 +31,52 @@ public class TestService {
     @Autowired
     private ChapterRepository chapterRepository;
 
-    public ApiResponse<Map<String, Object>> startTest(Long chapterId, Long userId) {
-        try {
-            // Check if chapter is read
-            boolean isChapterRead = chapterReadLogRepository
-                    .existsByUserIdAndChapterIdAndIsCompleted(userId, chapterId, true);
+    @Transactional
+    public ApiResponse<Map<String, Object>> startTest(Long userId, Long chapterId) {
 
-            if (!isChapterRead) {
-                return ApiResponse.error("Please read the chapter before starting the test", null);
-            }
+        int totalQuestions = 10;
 
-            // Get random questions for the chapter
-            List<Question> questions = questionRepository.findRandomQuestionsByChapterId(chapterId, 10);
+        // Step 1: Get distinct chapter IDs
+        List<Long> chapterIds = questionRepository.findAllDistinctChapterIds();
 
-            if (questions.isEmpty()) {
-                return ApiResponse.error("No questions available for this chapter", null);
-            }
-
-            // Create test session
-            String sessionId = UUID.randomUUID().toString();
-            Integer attemptNumber = testSessionRepository.countAttemptsByUserIdAndChapterId(userId, chapterId) + 1;
-
-            TestSession session = new TestSession(sessionId, userId, chapterId, questions.size());
-            session.setAttemptNumber(attemptNumber);
-            testSessionRepository.save(session);
-
-            // Convert questions to DTO (without correct answers)
-            List<QuestionResponseDTO> questionDTOs = questions.stream()
-                    .map(q -> new QuestionResponseDTO(
-                            q.getId(), q.getQuestionText(), q.getOptionA(),
-                            q.getOptionB(), q.getOptionC(), q.getOptionD()
-                    ))
-                    .collect(Collectors.toList());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("testSessionId", sessionId);
-            response.put("questions", questionDTOs);
-            response.put("totalQuestions", questions.size());
-            response.put("attemptNumber", attemptNumber);
-
-            return ApiResponse.success("Test started successfully", response);
-
-        } catch (Exception e) {
-            return ApiResponse.error("Failed to start test: " + e.getMessage(), null);
+        // If chapter count > totalQuestions, limit chapters
+        if (chapterIds.size() > totalQuestions) {
+            chapterIds = chapterIds.subList(0, totalQuestions);
         }
+
+        // Step 2: One random question from each chapter
+        List<Question> mandatoryQuestions = new ArrayList<>();
+        for (Long cid : chapterIds) {
+            questionRepository.findOneRandomQuestionByChapterId(cid)
+                    .ifPresent(mandatoryQuestions::add);
+        }
+
+        // Step 3: Calculate remaining questions needed
+        int remaining = totalQuestions - mandatoryQuestions.size();
+
+        List<Long> usedQuestionIds = mandatoryQuestions.stream()
+                .map(Question::getId)
+                .collect(Collectors.toList());
+
+        // Step 4: Fetch additional random questions (exclude already used)
+        List<Question> remainingQuestions = new ArrayList<>();
+        if (remaining > 0) {
+            remainingQuestions = questionRepository.findRandomQuestionsExcludingIds(usedQuestionIds, remaining);
+        }
+
+        // Step 5: Combine & shuffle
+        List<Question> finalQuestionSet = new ArrayList<>(mandatoryQuestions);
+        finalQuestionSet.addAll(remainingQuestions);
+        Collections.shuffle(finalQuestionSet);
+
+        // Step 6: Prepare response
+        Map<String, Object> data = new HashMap<>();
+        data.put("questions", finalQuestionSet);
+
+        return new ApiResponse<>(true, "Test started", data);
     }
+
+
 
     public ApiResponse<TestResultResponseDTO> submitTest(TestSubmissionDTO submission, Long userId) {
         try {

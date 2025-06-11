@@ -23,7 +23,7 @@ public class TestController {
 
     @PostMapping("/start")
     public ResponseEntity<ApiResponse<Map<String, Object>>> startTest(
-            @RequestParam Long chapterId,
+            @RequestParam(required = false) Long chapterId, // now optional
             @RequestParam Long userId) {
         ApiResponse<Map<String, Object>> response = testService.startTest(chapterId, userId);
         return ResponseEntity.ok(response);
