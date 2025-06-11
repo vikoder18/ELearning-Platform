@@ -45,13 +45,13 @@ public class TestResult {
     }
 
     public TestResult(Long userId, Long chapterId, Long questionId, String selectedAnswer,
-                      Boolean isCorrect, String testSessionId, Integer attemptNumber) {
+                      Boolean isCorrect, Long testSessionId, Integer attemptNumber) {
         this.userId = userId;
         this.chapterId = chapterId;
         this.questionId = questionId;
         this.selectedAnswer = selectedAnswer;
         this.isCorrect = isCorrect;
-        this.testSessionId = testSessionId;
+        this.testSessionId = String.valueOf(testSessionId);
         this.attemptNumber = attemptNumber;
     }
 }

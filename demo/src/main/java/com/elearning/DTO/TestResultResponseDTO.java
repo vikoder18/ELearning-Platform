@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class TestResultResponseDTO {
-    private String testSessionId;
+    private Long testSessionId;
     private Long chapterId;
     private String chapterTitle;
     private Integer totalQuestions;

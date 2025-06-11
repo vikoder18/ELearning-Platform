@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 @Table(name = "el_test_sessions")
 public class TestSession {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO) // or AUTO
+    private Long id;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -51,7 +52,7 @@ public class TestSession {
     public TestSession() {
     }
 
-    public TestSession(String id, Long userId, Long chapterId, Integer totalQuestions) {
+    public TestSession(Long id, Long userId, Long chapterId, Integer totalQuestions) {
         this.id = id;
         this.userId = userId;
         this.chapterId = chapterId;

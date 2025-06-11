@@ -69,8 +69,17 @@ public class TestService {
         finalQuestionSet.addAll(remainingQuestions);
         Collections.shuffle(finalQuestionSet);
 
-        // Step 6: Prepare response
+        //Step 5: Create TestSession and save
+        TestSession session = new TestSession();
+        session.setUserId(userId);
+        session.setChapterId(chapterId); // Optional
+        session.setStartedAt(LocalDateTime.now());
+        //session.setQuestions(finalQuestionSet); // Save question list if supported
+        testSessionRepository.save(session);
+
+        //Step 6: Return session ID in response
         Map<String, Object> data = new HashMap<>();
+        data.put("testSessionId", session.getId());
         data.put("questions", finalQuestionSet);
 
         return new ApiResponse<>(true, "Test started", data);
@@ -81,7 +90,7 @@ public class TestService {
     public ApiResponse<TestResultResponseDTO> submitTest(TestSubmissionDTO submission, Long userId) {
         try {
             // Get test session
-            Optional<TestSession> sessionOpt = testSessionRepository.findById(submission.getTestSessionId());
+            Optional<TestSession> sessionOpt = testSessionRepository.findById(String.valueOf(submission.getTestSessionId()));
             if (sessionOpt.isEmpty()) {
                 return ApiResponse.error("Invalid test session", null);
             }
