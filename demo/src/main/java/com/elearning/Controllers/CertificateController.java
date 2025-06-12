@@ -17,9 +17,8 @@ public class CertificateController {
 
     @PostMapping("/generate")
     public ResponseEntity<ApiResponse<Map<String, Object>>> generateCertificate(
-            @RequestParam Long userId,
-            @RequestParam Long chapterId) {
-        ApiResponse<Map<String, Object>> response = certificateService.generateCertificate(userId, chapterId);
+            @RequestParam Long userId) {
+        ApiResponse<Map<String, Object>> response = certificateService.generateCertificate(userId);
         return ResponseEntity.ok(response);
     }
 

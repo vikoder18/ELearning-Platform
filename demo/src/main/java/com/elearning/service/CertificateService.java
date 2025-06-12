@@ -23,11 +23,11 @@ public class CertificateService {
     @Autowired
     private UserRepository userRepository;
 
-    public ApiResponse<Map<String, Object>> generateCertificate(Long userId, Long chapterId) {
+    public ApiResponse<Map<String, Object>> generateCertificate(Long userId) {
         try {
             // Check if user has passed the test for this chapter
             Optional<TestSession> sessionOpt = testSessionRepository
-                    .findByUserIdAndChapterIdAndPassed(userId, chapterId, true);
+                    .findByUserIdAndPassed(userId, true);
 
             if (sessionOpt.isEmpty()) {
                 return ApiResponse.error("No passing test found for this chapter", null);
@@ -37,19 +37,19 @@ public class CertificateService {
 
             // Get user and chapter details
             Optional<User> userOpt = userRepository.findById(userId);
-            Optional<Chapter> chapterOpt = chapterRepository.findById(chapterId);
+           // Optional<Chapter> chapterOpt = chapterRepository.findById(chapterId);
 
-            if (userOpt.isEmpty() || chapterOpt.isEmpty()) {
-                return ApiResponse.error("User or chapter not found", null);
-            }
+//            if (userOpt.isEmpty() || chapterOpt.isEmpty()) {
+//                return ApiResponse.error("User or chapter not found", null);
+//            }
 
             User user = userOpt.get();
-            Chapter chapter = chapterOpt.get();
+           // Chapter chapter = chapterOpt.get();
 
             // Create certificate data
             Map<String, Object> certificateData = new HashMap<>();
             certificateData.put("userName", user.getUsername());
-            certificateData.put("chapterTitle", chapter.getTitle());
+           // certificateData.put("chapterTitle", chapter.getTitle());
             certificateData.put("scorePercentage", session.getScorePercentage());
             certificateData.put("completedDate", session.getCompletedAt());
             certificateData.put("certificateId", "CERT-" + session.getId());

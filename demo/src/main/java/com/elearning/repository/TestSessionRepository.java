@@ -17,5 +17,5 @@ public interface TestSessionRepository extends JpaRepository<TestSession, String
     @Query("SELECT COUNT(ts) FROM TestSession ts WHERE ts.userId = :userId AND ts.chapterId = :chapterId")
     Integer countAttemptsByUserIdAndChapterId(@Param("userId") Long userId, @Param("chapterId") Long chapterId);
 
-    Optional<TestSession> findByUserIdAndChapterIdAndPassed(Long userId, Long chapterId, Boolean passed);
+    Optional<TestSession> findByUserIdAndPassed(Long userId, Boolean passed);
 }
