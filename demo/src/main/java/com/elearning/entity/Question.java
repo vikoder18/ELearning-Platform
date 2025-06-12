@@ -29,7 +29,7 @@ public class Question {
     @Column(name = "option_d")
     private String optionD;
 
-    @Column(name = "correct_answer", nullable = false, length = 1)
+    @Column(name = "correct_answer", nullable = false, length = 100)
     private String correctAnswer;
 
     @Column(name = "created_at")
