@@ -20,7 +20,7 @@ public class TestResult {
     @Column(name = "question_id", nullable = false)
     private Long questionId;
 
-    @Column(name = "selected_answer", length = 1)
+    @Column(name = "selected_answer", length = 100)
     private String selectedAnswer;
 
     @Column(name = "is_correct")
