@@ -26,7 +26,7 @@ public class TestSession {
     private Integer correctAnswers;
 
     @Column(name = "score_percentage", precision = 5, scale = 2)
-    private BigDecimal scorePercentage;
+    private BigDecimal scorePercentage = BigDecimal.ZERO;
 
     @Column(name = "passed")
     private Boolean passed = false;
