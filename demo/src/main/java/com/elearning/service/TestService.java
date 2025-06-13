@@ -35,6 +35,13 @@ public class TestService {
     @Transactional
     public ApiResponse<Map<String, Object>> startTest(@Nullable Long chapterId, Long userId) {
 
+        // 🔐 Step 0: Check existing attempts
+        List<TestSession> attempts = testSessionRepository.findByUserId(userId);
+        if (attempts.size() >= 3) {
+            return ApiResponse.error("You have exhausted your attempts. Test cannot Start!", null);
+        }
+
+
         int totalQuestions = 10;
 
         // Step 1: Get distinct chapter IDs
@@ -73,6 +80,7 @@ public class TestService {
         //Step 5: Create TestSession and save
         TestSession session = new TestSession();
         session.setUserId(userId);
+        session.setAttemptNumber(attempts.size() + 1);
         if (chapterId != null) {
             session.setChapterId(chapterId);
         }
@@ -257,6 +265,23 @@ public class TestService {
                 throw e;
             }
     }
+
+    public TestAttemptStatusDTO getAttemptStatus(Long userId) {
+        // Fetch all attempts by user for this chapter
+        List<TestSession> sessions = testSessionRepository
+                .findByUserIdOrderByStartedAtDesc(userId);
+
+        int attemptsUsed = sessions.size();
+        int remaining = Math.max(0, 3 - attemptsUsed);
+        Double lastScore = null;
+
+        if (!sessions.isEmpty() && sessions.get(0).getScorePercentage() != null) {
+            lastScore = sessions.get(0).getScorePercentage().doubleValue();
+        }
+
+        return new TestAttemptStatusDTO(remaining, lastScore);
+    }
+
 
     public ApiResponse<List<TestSession>> getUserTestHistory(Long userId) {
         try {

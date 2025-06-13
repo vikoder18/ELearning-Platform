@@ -1,6 +1,7 @@
 package com.elearning.Controllers;
 
 import com.elearning.DTO.ApiResponse;
+import com.elearning.DTO.TestAttemptStatusDTO;
 import com.elearning.DTO.TestResultResponseDTO;
 import com.elearning.DTO.TestSubmissionDTO;
 import com.elearning.entity.TestSession;
@@ -45,6 +46,13 @@ public class TestController {
         ApiResponse<TestResultResponseDTO> response = testService.getTestResult(testSessionId, userId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/attempts")
+    public ResponseEntity<TestAttemptStatusDTO> getUserAttemptStatus(
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(testService.getAttemptStatus(userId));
+    }
+
 
     @GetMapping("/history")
     public ResponseEntity<ApiResponse<List<TestSession>>> getUserTestHistory(@RequestParam Long userId) {

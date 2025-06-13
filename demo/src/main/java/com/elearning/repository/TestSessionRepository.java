@@ -11,11 +11,12 @@ import java.util.Optional;
 
 @Repository
 public interface TestSessionRepository extends JpaRepository<TestSession, String> {
-    List<TestSession> findByUserIdAndChapterId(Long userId, Long chapterId);
+    List<TestSession> findByUserId(Long userId);
     List<TestSession> findByUserIdOrderByStartedAtDesc(Long userId);
 
-    @Query("SELECT COUNT(ts) FROM TestSession ts WHERE ts.userId = :userId AND ts.chapterId = :chapterId")
-    Integer countAttemptsByUserIdAndChapterId(@Param("userId") Long userId, @Param("chapterId") Long chapterId);
+//    @Query("SELECT COUNT(ts) FROM TestSession ts WHERE ts.userId = :userId AND ts.chapterId = :chapterId")
+//    Integer countAttemptsByUserIdAndChapterId(@Param("userId") Long userId, @Param("chapterId") Long chapterId);
 
     Optional<TestSession> findByUserIdAndPassed(Long userId, Boolean passed);
+
 }
